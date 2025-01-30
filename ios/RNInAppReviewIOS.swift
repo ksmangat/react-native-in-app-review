@@ -7,7 +7,16 @@ class RNInAppReviewIOS: NSObject {
 
   @objc 
   func requestReview (_ resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) -> Void {
-      if #available(iOS 14.0, *) {
+    if #available(iOS 16.0, *) {
+      // For iOS 16+, use RequestReviewAction
+      if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+        let action = SKStoreReviewController.RequestReviewAction()
+        action.perform()
+        resolve("true")
+      } else {
+        reject("25", "SCENE_DOESN'T_EXIST", nil)
+      }
+    } else if #available(iOS 14.0, *) {
         if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
             SKStoreReviewController.requestReview(in: scene)
             resolve("true");
